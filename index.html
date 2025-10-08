@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    @font-face {
+      font-family: 'Digital-7';
+      src: url('fonts/digital-7.mono.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Inconsolata';
+      src: url('fonts/inconsolata-regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    table, td {
+      border: 1px solid black;
+      user-select: none;
+    }
+    td {
+      text-align: center;
+      width: 100px;
+      height: 100px;
+      font-size: 500%;
+      font-family: 'Inconsolata';
+    }
+    td:hover {
+      background-color: hsl(0, 0%, 90%);
+    }
+    #tdD {
+      width: 418px;
+      height: 100px;
+      font-family: 'Digital-7';
+      font-size: 600%;
+    }
+    #tdDisplay:hover {
+      background-color: white;
+    }
+    #td\+, #td\= {
+      width: 100px;
+      height: 206px;
+    }
+    #tdN {
+      font-size: 350%;
+    }
+    /* #td0 {
+      width: 206px;
+      height: 100px;
+    } */
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td id="tdD" colspan="4"></td>
+    </tr>
+    <tr>
+      <td id="tdC">C</td>
+      <td id="td/">/</td>
+      <td id="td*">*</td>
+      <td id="td-">-</td>
+    </tr>
+    <tr>
+      <td id="td7">7</td>
+      <td id="td8">8</td>
+      <td id="td9">9</td>
+      <td id="td+" rowspan="2">+</td>
+    </tr>
+    <tr>
+      <td id="td4">4</td>
+      <td id="td5">5</td>
+      <td id="td6">6</td>
+    </tr>
+    <tr>
+      <td id="td1">1</td>
+      <td id="td2">2</td>
+      <td id="td3">3</td>
+      <td id="td=" rowspan="2">=</td>
+    </tr>
+    <tr>
+      <td id="tdN">+/-</td>
+      <td id="td0">0</td>
+      <td id="td.">.</td>
+    </tr>
+  </table>
+
+  <script>
+    function display() {
+      h = displayedNum.slice(0, 9)
+      document.getElementById('tdD').innerText = h
+    }
+
+    function showVars() {
+      console.log(displayedNum)
+      console.log(lastNum)
+      console.log(lastOp)
+      console.log(currentOp)
+    }
+
+    function tdClicked(sign) {
+      if('1234567890'.includes(sign)) {
+        if(currentOp) {
+          lastNum = displayedNum
+          displayedNum = ''
+          lastOp = currentOp
+          currentOp = ''
+        }
+        displayedNum += sign
+        display()
+      } else if('-+/*'.includes(sign)) {
+        if(displayedNum) {
+          if(currentOp === '=') {
+            lastNum = ''
+            lastOp = ''
+          }
+          currentOp = sign
+          displayedNum = eval(lastNum+lastOp+displayedNum).toString()
+          display()
+        }
+      } else if('=' === sign) {
+        if((lastNum && !currentOp) || currentOp === '=') {
+          if(currentOp) {
+            displayedNum = eval(displayedNum+lastOp+lastNum).toString()
+          } else {
+            currentOp = '='
+            h = displayedNum
+            displayedNum = eval(lastNum+lastOp+displayedNum).toString()
+            lastNum = h
+          }
+          display()
+        }
+      } else if('.' === sign) {
+
+      } else { //C
+        displayedNum = ''
+        display()
+        lastNum = ''
+        lastOp = ''
+        currentOp = ''
+      }
+      showVars()
+    }
+
+    let displayedNum = ''
+    let lastNum = ''
+    let lastOp = ''
+    let currentOp = ''
+    let h
+
+    let signs = '1234567890-+/*=C.'
+    for(let i = 0; i < signs.length; i++) {
+      document.getElementById('td'+signs[i]).addEventListener('click', () => {
+        tdClicked(signs[i])
+      })
+    }
+  </script>
+</body>
+</html>
