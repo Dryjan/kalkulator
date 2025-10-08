@@ -37,10 +37,10 @@
       font-family: 'Digital-7';
       font-size: 600%;
     }
-    #tdDisplay:hover {
+    #tdD:hover {
       background-color: white;
     }
-    #td\+, #td\= {
+    #td\= {
       width: 100px;
       height: 206px;
     }
@@ -60,20 +60,21 @@
     </tr>
     <tr>
       <td id="tdC">C</td>
+      <td id="tdB">B</td>
       <td id="td/">/</td>
       <td id="td*">*</td>
-      <td id="td-">-</td>
     </tr>
     <tr>
       <td id="td7">7</td>
       <td id="td8">8</td>
       <td id="td9">9</td>
-      <td id="td+" rowspan="2">+</td>
+      <td id="td-">-</td>
     </tr>
     <tr>
       <td id="td4">4</td>
       <td id="td5">5</td>
       <td id="td6">6</td>
+      <td id="td+">+</td>
     </tr>
     <tr>
       <td id="td1">1</td>
@@ -92,6 +93,7 @@
     function display() {
       h = displayedNum.slice(0, 9)
       document.getElementById('tdD').innerText = h
+      showVars()
     }
 
     function showVars() {
@@ -101,48 +103,80 @@
       console.log(currentOp)
     }
 
-    function tdClicked(sign) {
-      if('1234567890'.includes(sign)) {
+    function tdNum(num) {
+      if(currentOp) {
+        lastNum = displayedNum
+        displayedNum = ''
+        lastOp = currentOp
+        currentOp = ''
+        if(lastOp === '=') {
+          lastNum = ''
+          lastOp = ''
+        }
+      }
+      displayedNum += num
+      display()
+    } 
+      
+    function tdOp(op) {
+      if(displayedNum) {
+        if(currentOp === '=') {
+          lastNum = ''
+          lastOp = ''
+        }
+        currentOp = op
+        displayedNum = eval(lastNum+lastOp+displayedNum).toString()
+        display()
+      }
+    } 
+      
+    function tdEq() {
+      if(((lastNum && !currentOp) || currentOp === '=') && !isNaN(parseFloat(displayedNum))) {
+        if(currentOp) {
+          displayedNum = eval(displayedNum+lastOp+lastNum).toString()
+        } else {
+          currentOp = '='
+          h = displayedNum
+          displayedNum = eval(lastNum+lastOp+displayedNum).toString()
+          lastNum = h
+        }
+        display()
+      }
+    } 
+      
+    function tdPoint() {
+      if(!displayedNum.includes('.')) {
         if(currentOp) {
           lastNum = displayedNum
           displayedNum = ''
           lastOp = currentOp
           currentOp = ''
         }
-        displayedNum += sign
+        displayedNum += '.'
         display()
-      } else if('-+/*'.includes(sign)) {
-        if(displayedNum) {
-          if(currentOp === '=') {
-            lastNum = ''
-            lastOp = ''
-          }
-          currentOp = sign
-          displayedNum = eval(lastNum+lastOp+displayedNum).toString()
-          display()
-        }
-      } else if('=' === sign) {
-        if((lastNum && !currentOp) || currentOp === '=') {
-          if(currentOp) {
-            displayedNum = eval(displayedNum+lastOp+lastNum).toString()
-          } else {
-            currentOp = '='
-            h = displayedNum
-            displayedNum = eval(lastNum+lastOp+displayedNum).toString()
-            lastNum = h
-          }
-          display()
-        }
-      } else if('.' === sign) {
-
-      } else { //C
-        displayedNum = ''
-        display()
-        lastNum = ''
-        lastOp = ''
-        currentOp = ''
       }
-      showVars()
+    } 
+      
+    function tdNeg() {
+      if(displayedNum && !isNaN(parseFloat(displayedNum))) {
+        displayedNum = (parseFloat(displayedNum) * -1).toString()
+        display()
+      }
+    } 
+      
+    function tdBack() {
+      if(displayedNum && !currentOp) {
+        displayedNum = displayedNum.slice(0, -1)
+        display()
+      }
+    } 
+      
+    function tdClear() {
+      displayedNum = ''
+      lastNum = ''
+      lastOp = ''
+      currentOp = ''
+      display()
     }
 
     let displayedNum = ''
@@ -151,13 +185,25 @@
     let currentOp = ''
     let h
 
-    let signs = '1234567890-+/*=C.'
-    for(let i = 0; i < signs.length; i++) {
-      document.getElementById('td'+signs[i]).addEventListener('click', () => {
-        tdClicked(signs[i])
+    let nums = '1234567890'
+    for(let i = 0; i < nums.length; i++) {
+      document.getElementById('td'+nums[i]).addEventListener('click', () => {
+        tdNum(nums[i])
       })
     }
+
+    let ops = '-+/*'
+    for(let i = 0; i < ops.length; i++) {
+      document.getElementById('td'+ops[i]).addEventListener('click', () => {
+        tdOp(ops[i])
+      })
+    }
+
+    document.getElementById('td=').addEventListener('click', tdEq)
+    document.getElementById('td.').addEventListener('click', tdPoint)
+    document.getElementById('tdN').addEventListener('click', tdNeg)
+    document.getElementById('tdB').addEventListener('click', tdBack)
+    document.getElementById('tdC').addEventListener('click', tdClear)
   </script>
 </body>
-
 </html>
