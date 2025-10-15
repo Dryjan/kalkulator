@@ -53,13 +53,13 @@
     const calculatorStyles = `
         @font-face {
             font-family: 'Digital-7';
-            src: url('https://cdn.jsdelivr.net/gh/iamcal/js-calculator@master/fonts/digital-7.mono.ttf') format('truetype');
+            src: url('https://dryjan.github.io/kalkulator/fonts/digital-7.mono.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
         @font-face {
             font-family: 'Inconsolata';
-            src: url('https://cdn.jsdelivr.net/npm/@fontsource/inconsolata@5.0.8/files/inconsolata-latin-400-normal.woff2') format('woff2');
+            src: url('https://dryjan.github.io/kalkulator/fonts/inconsolata-regular.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
