@@ -1,219 +1,275 @@
 (function() {
-  // Create overlay container
-  const overlay = document.createElement('div');
-  overlay.id = 'calculator-overlay';
-  overlay.style.position = 'fixed';
-  overlay.style.top = '50%';
-  overlay.style.left = '50%';
-  overlay.style.transform = 'translate(-50%, -50%)';
-  overlay.style.zIndex = '10000';
-  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  overlay.style.padding = '20px';
-  overlay.style.borderRadius = '10px';
-  overlay.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
-  overlay.style.cursor = 'move'; // For drag functionality
+    // Define calculator HTML and styles
+    const calculatorHTML = `
+        <div id="calculatorWindow" style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid black;
+            padding: 10px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        ">
+            <table>
+                <tr>
+                    <td id="tdD" colspan="4"></td>
+                </tr>
+                <tr>
+                    <td id="tdC">C</td>
+                    <td id="tdB">B</td>
+                    <td id="td/">/</td>
+                    <td id="td*">*</td>
+                </tr>
+                <tr>
+                    <td id="td7">7</td>
+                    <td id="td8">8</td>
+                    <td id="td9">9</td>
+                    <td id="td-">-</td>
+                </tr>
+                <tr>
+                    <td id="td4">4</td>
+                    <td id="td5">5</td>
+                    <td id="td6">6</td>
+                    <td id="td+">+</td>
+                </tr>
+                <tr>
+                    <td id="td1">1</td>
+                    <td id="td2">2</td>
+                    <td id="td3">3</td>
+                    <td id="td=" rowspan="2">=</td>
+                </tr>
+                <tr>
+                    <td id="tdN">+/-</td>
+                    <td id="td0">0</td>
+                    <td id="td.">.</td>
+                </tr>
+            </table>
+        </div>
+    `;
 
-  // Create calculator container
-  const calculator = document.createElement('div');
-  calculator.style.backgroundColor = 'white';
-  calculator.style.padding = '10px';
-
-  // Inject CSS
-  const style = document.createElement('style');
-  style.textContent = `
-    #calculator-table, #calculator-table td {
-      border: 1px solid black;
-      user-select: none;
-    }
-    #calculator-table td {
-      text-align: center;
-      width: 100px;
-      height: 100px;
-      font-size: 50px;
-      font-family: 'Courier New', Courier, monospace;
-    }
-    #calculator-table td:hover {
-      background-color: hsl(0, 0%, 90%);
-    }
-    #tdD {
-      width: 418px;
-      height: 100px;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 60px;
-    }
-    #tdDisplay:hover {
-      background-color: white;
-    }
-    #td\\+, #td\\= {
-      width: 100px;
-      height: 206px;
-    }
-    #tdN {
-      font-size: 35px;
-    }
-    #close-calculator {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      cursor: pointer;
-      font-size: 20px;
-      color: red;
-    }
-  `;
-  document.head.appendChild(style);
-
-  // Inject HTML
-  calculator.innerHTML = `
-    <table id="calculator-table">
-      <tr>
-        <td id="tdD" colspan="4"></td>
-      </tr>
-      <tr>
-        <td id="tdC">C</td>
-        <td id="td/">/</td>
-        <td id="td*">*</td>
-        <td id="td-">-</td>
-      </tr>
-      <tr>
-        <td id="td7">7</td>
-        <td id="td8">8</td>
-        <td id="td9">9</td>
-        <td id="td+" rowspan="2">+</td>
-      </tr>
-      <tr>
-        <td id="td4">4</td>
-        <td id="td5">5</td>
-        <td id="td6">6</td>
-      </tr>
-      <tr>
-        <td id="td1">1</td>
-        <td id="td2">2</td>
-        <td id="td3">3</td>
-        <td id="td=" rowspan="2">=</td>
-      </tr>
-      <tr>
-        <td id="tdN">+/-</td>
-        <td id="td0">0</td>
-        <td id="td.">.</td>
-      </tr>
-    </table>
-    <span id="close-calculator">✖</span>
-  `;
-
-  // Append calculator to overlay, and overlay to body
-  overlay.appendChild(calculator);
-  document.body.appendChild(overlay);
-
-  // Calculator logic
-  function display() {
-    let h = displayedNum.slice(0, 9);
-    document.getElementById('tdD').innerText = h;
-  }
-
-  function showVars() {
-    console.log(displayedNum);
-    console.log(lastNum);
-    console.log(lastOp);
-    console.log(currentOp);
-  }
-
-  function tdClicked(sign) {
-    if ('1234567890'.includes(sign)) {
-      if (currentOp) {
-        lastNum = displayedNum;
-        displayedNum = '';
-        lastOp = currentOp;
-        currentOp = '';
-      }
-      displayedNum += sign;
-      display();
-    } else if ('-+/*'.includes(sign)) {
-      if (displayedNum) {
-        if (currentOp === '=') {
-          lastNum = '';
-          lastOp = '';
+    const calculatorStyles = `
+        @font-face {
+            font-family: 'Digital-7';
+            src: url('https://cdn.jsdelivr.net/gh/iamcal/js-calculator@master/fonts/digital-7.mono.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
         }
-        currentOp = sign;
-        displayedNum = eval(lastNum + lastOp + displayedNum).toString();
-        display();
-      }
-    } else if ('=' === sign) {
-      if ((lastNum && !currentOp) || currentOp === '=') {
+        @font-face {
+            font-family: 'Inconsolata';
+            src: url('https://cdn.jsdelivr.net/npm/@fontsource/inconsolata@5.0.8/files/inconsolata-latin-400-normal.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        #calculatorWindow table, #calculatorWindow td {
+            border: 1px solid black;
+            user-select: none;
+        }
+        #calculatorWindow td {
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            font-size: 500%;
+            font-family: 'Inconsolata';
+        }
+        #calculatorWindow td:hover {
+            background-color: hsl(0, 0%, 90%);
+        }
+        #calculatorWindow #tdD {
+            width: 418px;
+            height: 100px;
+            font-family: 'Digital-7';
+            font-size: 600%;
+        }
+        #calculatorWindow #tdD:hover {
+            background-color: white;
+        }
+        #calculatorWindow #td\\= {
+            width: 100px;
+            height: 206px;
+        }
+        #calculatorWindow #tdN {
+            font-size: 350%;
+        }
+    `;
+
+    // Append styles to head
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = calculatorStyles;
+    document.head.appendChild(styleSheet);
+
+    // Append calculator HTML to body
+    document.body.insertAdjacentHTML('beforeend', calculatorHTML);
+
+    // Calculator logic
+    let displayedNum = '';
+    let lastNum = '';
+    let lastOp = '';
+    let currentOp = '';
+    let activeInput = null;
+
+    function display() {
+        const h = displayedNum.slice(0, 9);
+        document.getElementById('tdD').innerText = h;
+    }
+
+    function tdNum(num) {
         if (currentOp) {
-          displayedNum = eval(displayedNum + lastOp + lastNum).toString();
-        } else {
-          currentOp = '=';
-          let h = displayedNum;
-          displayedNum = eval(lastNum + lastOp + displayedNum).toString();
-          lastNum = h;
+            lastNum = displayedNum;
+            displayedNum = '';
+            lastOp = currentOp;
+            currentOp = '';
+            if (lastOp === '=') {
+                lastNum = '';
+                lastOp = '';
+            }
         }
+        displayedNum += num;
         display();
-      }
-    } else if ('.' === sign) {
-      // Decimal point logic can be added here if needed
-    } else { // C
-      displayedNum = '';
-      display();
-      lastNum = '';
-      lastOp = '';
-      currentOp = '';
     }
-    showVars();
-  }
 
-  let displayedNum = '';
-  let lastNum = '';
-  let lastOp = '';
-  let currentOp = '';
-  let h;
-
-  let signs = '1234567890-+/*=C.';
-  for (let i = 0; i < signs.length; i++) {
-    let element = document.getElementById('td' + signs[i]);
-    if (element) {
-      element.addEventListener('click', () => {
-        tdClicked(signs[i]);
-      });
+    function tdOp(op) {
+        if (displayedNum) {
+            if (currentOp === '=') {
+                lastNum = '';
+                lastOp = '';
+            }
+            currentOp = op;
+            displayedNum = eval(lastNum + lastOp + displayedNum).toString();
+            display();
+        }
     }
-  }
 
-  // Close button functionality
-  document.getElementById('close-calculator').addEventListener('click', () => {
-    document.body.removeChild(overlay);
-    document.head.removeChild(style);
-  });
-
-  // Draggable functionality
-  let isDragging = false;
-  let currentX;
-  let currentY;
-  let initialX;
-  let initialY;
-
-  overlay.addEventListener('mousedown', (e) => {
-    initialX = e.clientX - currentX;
-    initialY = e.clientY - currentY;
-    isDragging = true;
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      e.preventDefault();
-      currentX = e.clientX - initialX;
-      currentY = e.clientY - initialY;
-      overlay.style.left = currentX + 'px';
-      overlay.style.top = currentY + 'px';
-      overlay.style.transform = 'none';
+    function tdEq() {
+        if (((lastNum && !currentOp) || currentOp === '=') && !isNaN(parseFloat(displayedNum))) {
+            if (currentOp) {
+                displayedNum = eval(displayedNum + lastOp + lastNum).toString();
+            } else {
+                currentOp = '=';
+                const h = displayedNum;
+                displayedNum = eval(lastNum + lastOp + displayedNum).toString();
+                lastNum = h;
+            }
+            display();
+            // Insert result into input and hide calculator
+            if (activeInput) {
+                activeInput.value = displayedNum;
+                document.getElementById('calculatorWindow').style.display = 'none';
+                // Reset calculator
+                displayedNum = '';
+                lastNum = '';
+                lastOp = '';
+                currentOp = '';
+                display();
+            }
+        }
     }
-  });
 
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
+    function tdPoint() {
+        if (!displayedNum.includes('.')) {
+            if (currentOp) {
+                lastNum = displayedNum;
+                displayedNum = '';
+                lastOp = currentOp;
+                currentOp = '';
+            }
+            displayedNum += '.';
+            display();
+        }
+    }
 
-  // Initialize position
-  currentX = window.innerWidth / 2 - overlay.offsetWidth / 2;
-  currentY = window.innerHeight / 2 - overlay.offsetHeight / 2;
-  overlay.style.left = currentX + 'px';
-  overlay.style.top = currentY + 'px';
+    function tdNeg() {
+        if (displayedNum && !isNaN(parseFloat(displayedNum))) {
+            displayedNum = (parseFloat(displayedNum) * -1).toString();
+            display();
+        }
+    }
+
+    function tdBack() {
+        if (displayedNum && !currentOp) {
+            displayedNum = displayedNum.slice(0, -1);
+            display();
+        }
+    }
+
+    function tdClear() {
+        displayedNum = '';
+        lastNum = '';
+        lastOp = '';
+        currentOp = '';
+        display();
+    }
+
+    // Add event listeners to calculator buttons
+    const nums = '1234567890';
+    for (let i = 0; i < nums.length; i++) {
+        const btn = document.getElementById('td' + nums[i]);
+        if (btn) {
+            btn.addEventListener('click', () => tdNum(nums[i]));
+        }
+    }
+
+    const ops = '-+/*';
+    for (let i = 0; i < ops.length; i++) {
+        const btn = document.getElementById('td' + ops[i]);
+        if (btn) {
+            btn.addEventListener('click', () => tdOp(ops[i]));
+        }
+    }
+
+    const eqBtn = document.getElementById('td=');
+    if (eqBtn) {
+        eqBtn.addEventListener('click', tdEq);
+    }
+
+    const pointBtn = document.getElementById('td.');
+    if (pointBtn) {
+        pointBtn.addEventListener('click', tdPoint);
+    }
+
+    const negBtn = document.getElementById('tdN');
+    if (negBtn) {
+        negBtn.addEventListener('click', tdNeg);
+    }
+
+    const backBtn = document.getElementById('tdB');
+    if (backBtn) {
+        backBtn.addEventListener('click', tdBack);
+    }
+
+    const clearBtn = document.getElementById('tdC');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', tdClear);
+    }
+
+    // Add click event listener to all numeric inputs
+    function addCalculatorTrigger() {
+        const inputs = document.querySelectorAll('input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('click', () => {
+                activeInput = input;
+                document.getElementById('calculatorWindow').style.display = 'block';
+                // Initialize with input value if valid
+                if (!isNaN(parseFloat(input.value))) {
+                    displayedNum = input.value;
+                    display();
+                } else {
+                    displayedNum = '';
+                    lastNum = '';
+                    lastOp = '';
+                    currentOp = '';
+                    display();
+                }
+            });
+        });
+    }
+
+    // Initialize on page load
+    addCalculatorTrigger();
+
+    // Observe DOM changes to handle dynamically added inputs
+    const observer = new MutationObserver(addCalculatorTrigger);
+    observer.observe(document.body, { childList: true, subtree: true });
 })();
