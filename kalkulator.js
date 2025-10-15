@@ -8,11 +8,26 @@
             transform: translate(-50%, -50%);
             background: white;
             border: 2px solid black;
-            padding: 10px;
+            padding: 5px;
             z-index: 1000;
             display: none;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         ">
+            <div id="closeCalculator" style="
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                width: 20px;
+                height: 20px;
+                background: red;
+                color: white;
+                text-align: center;
+                line-height: 20px;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 50%;
+            ">X</div>
             <table>
                 <tr>
                     <td id="tdD" colspan="4"></td>
@@ -53,13 +68,13 @@
     const calculatorStyles = `
         @font-face {
             font-family: 'Digital-7';
-            src: url('https://dryjan.github.io/kalkulator/fonts/digital-7.mono.ttf') format('truetype');
+            src: url('https://https://dryjan.github.io/kalkulator/fonts/digital-7.mono.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
         @font-face {
             font-family: 'Inconsolata';
-            src: url('https://dryjan.github.io/kalkulator/fonts/inconsolata-regular.ttf') format('truetype');
+            src: url('https://dryjan.github.io/kalkulator/fonts/inconsolata-regular.ttf') format('woff2');
             font-weight: normal;
             font-style: normal;
         }
@@ -69,29 +84,29 @@
         }
         #calculatorWindow td {
             text-align: center;
-            width: 100px;
-            height: 100px;
-            font-size: 500%;
+            width: 50px;
+            height: 50px;
+            font-size: 250%;
             font-family: 'Inconsolata';
         }
         #calculatorWindow td:hover {
             background-color: hsl(0, 0%, 90%);
         }
         #calculatorWindow #tdD {
-            width: 418px;
-            height: 100px;
+            width: 209px;
+            height: 50px;
             font-family: 'Digital-7';
-            font-size: 600%;
+            font-size: 300%;
         }
         #calculatorWindow #tdD:hover {
             background-color: white;
         }
         #calculatorWindow #td\\= {
-            width: 100px;
-            height: 206px;
+            width: 50px;
+            height: 103px;
         }
         #calculatorWindow #tdN {
-            font-size: 350%;
+            font-size: 175%;
         }
     `;
 
@@ -244,29 +259,47 @@
         clearBtn.addEventListener('click', tdClear);
     }
 
-    // Add click event listener to all numeric inputs
-    function addCalculatorTrigger() {
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('click', () => {
-                activeInput = input;
-                document.getElementById('calculatorWindow').style.display = 'block';
-                // Initialize with input value if valid
-                if (!isNaN(parseFloat(input.value))) {
-                    displayedNum = input.value;
-                    display();
-                } else {
-                    displayedNum = '';
-                    lastNum = '';
-                    lastOp = '';
-                    currentOp = '';
-                    display();
-                }
-            });
+    // Add close button functionality
+    const closeBtn = document.getElementById('closeCalculator');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('calculatorWindow').style.display = 'none';
+            // Reset calculator
+            displayedNum = '';
+            lastNum = '';
+            lastOp = '';
+            currentOp = '';
+            display();
         });
     }
 
-    // Initialize on page load
+    // Add click event listener to all inputs
+    function addCalculatorTrigger() {
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            // Skip if already has the event listener to avoid duplicates
+            if (!input.dataset.calculatorAttached) {
+                input.addEventListener('click', () => {
+                    activeInput = input;
+                    document.getElementById('calculatorWindow').style.display = 'block';
+                    // Initialize with input value if valid number
+                    if (!isNaN(parseFloat(input.value))) {
+                        displayedNum = input.value;
+                        display();
+                    } else {
+                        displayedNum = '';
+                        lastNum = '';
+                        lastOp = '';
+                        currentOp = '';
+                        display();
+                    }
+                });
+                input.dataset.calculatorAttached = 'true';
+            }
+        });
+    }
+
+    // Initialize on script execution
     addCalculatorTrigger();
 
     // Observe DOM changes to handle dynamically added inputs
