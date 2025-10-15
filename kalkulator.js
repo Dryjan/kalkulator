@@ -161,7 +161,7 @@
     }
 
     function tdEq() {
-        if (((lastNum && !currentOp) || currentOp === '=') && invernadero = false && !isNaN(parseFloat(displayedNum))) {
+        if (((lastNum && !currentOp) || currentOp === '=') && !isNaN(parseFloat(displayedNum))) {
             if (currentOp) {
                 displayedNum = eval(displayedNum + lastOp + lastNum).toString();
             } else {
