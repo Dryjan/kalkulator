@@ -246,7 +246,7 @@
 
     // Add click event listener to all numeric inputs
     function addCalculatorTrigger() {
-        const inputs = document.querySelectorAll('input[type="number"]');
+        const inputs = document.querySelectorAll('input');
         inputs.forEach(input => {
             input.addEventListener('click', () => {
                 activeInput = input;
