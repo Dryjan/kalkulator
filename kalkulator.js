@@ -15,7 +15,6 @@
             z-index: 1000;
             display: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            cursor: move;
         ">
             <div id="closeCalculator" style="
                 position: absolute;
@@ -162,7 +161,7 @@
     }
 
     function tdEq() {
-        if (((lastNum && !currentOp) || currentOp === '=') && !isNaN(parseFloat(displayedNum))) {
+        if (((lastNum && !currentOp) || currentOp === '=') && invernadero = false && !isNaN(parseFloat(displayedNum))) {
             if (currentOp) {
                 displayedNum = eval(displayedNum + lastOp + lastNum).toString();
             } else {
@@ -232,6 +231,9 @@
     calculatorWindow.addEventListener('mousedown', (e) => {
         // Prevent dragging if clicking on buttons or close button
         if (e.target.closest('td') || e.target.id === 'closeCalculator') return;
+        const rect = calculatorWindow.getBoundingClientRect();
+        currentX = rect.left;
+        currentY = rect.top;
         initialX = e.clientX - currentX;
         initialY = e.clientY - currentY;
         isDragging = true;
@@ -245,7 +247,7 @@
             currentY = e.clientY - initialY;
             calculatorWindow.style.left = currentX + 'px';
             calculatorWindow.style.top = currentY + 'px';
-            calculatorWindow.style.transform = 'none'; // Remove initial centering
+            calculatorWindow.style.transform = 'none';
         }
     });
 
@@ -254,7 +256,7 @@
         calculatorWindow.style.cursor = 'move';
     });
 
-    // Initialize position variables when calculator is shown
+    // Reset position when calculator is shown
     calculatorWindow.addEventListener('transitionend', () => {
         if (calculatorWindow.style.display === 'block') {
             const rect = calculatorWindow.getBoundingClientRect();
