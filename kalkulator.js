@@ -68,13 +68,13 @@
     const calculatorStyles = `
         @font-face {
             font-family: 'Digital-7';
-            src: url('https://https://dryjan.github.io/kalkulator/fonts/digital-7.mono.ttf') format('truetype');
+            src: url('https://dryjan.github.io/kalkulator/fonts/digital-7.mono.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
         @font-face {
             font-family: 'Inconsolata';
-            src: url('https://dryjan.github.io/kalkulator/fonts/inconsolata-regular.ttf') format('woff2');
+            src: url('https://dryjan.github.io/kalkulator/fonts/inconsolata-regular.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
