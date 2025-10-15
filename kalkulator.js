@@ -1,4 +1,7 @@
 (function() {
+    // Check if calculator is already loaded to prevent duplicates
+    if (document.getElementById('calculatorWindow')) return;
+
     // Define calculator HTML and styles
     const calculatorHTML = `
         <div id="calculatorWindow" style="
@@ -12,6 +15,7 @@
             z-index: 1000;
             display: none;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: move;
         ">
             <div id="closeCalculator" style="
                 position: absolute;
@@ -216,6 +220,48 @@
         currentOp = '';
         display();
     }
+
+    // Add drag functionality
+    const calculatorWindow = document.getElementById('calculatorWindow');
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+
+    calculatorWindow.addEventListener('mousedown', (e) => {
+        // Prevent dragging if clicking on buttons or close button
+        if (e.target.closest('td') || e.target.id === 'closeCalculator') return;
+        initialX = e.clientX - currentX;
+        initialY = e.clientY - currentY;
+        isDragging = true;
+        calculatorWindow.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            e.preventDefault();
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+            calculatorWindow.style.left = currentX + 'px';
+            calculatorWindow.style.top = currentY + 'px';
+            calculatorWindow.style.transform = 'none'; // Remove initial centering
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        calculatorWindow.style.cursor = 'move';
+    });
+
+    // Initialize position variables when calculator is shown
+    calculatorWindow.addEventListener('transitionend', () => {
+        if (calculatorWindow.style.display === 'block') {
+            const rect = calculatorWindow.getBoundingClientRect();
+            currentX = rect.left;
+            currentY = rect.top;
+        }
+    });
 
     // Add event listeners to calculator buttons
     const nums = '1234567890';
